@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #255000 0%, #588100 100%);
             min-height: 100vh;
             color: #333;
         }
@@ -41,7 +41,7 @@
             color: #4a5568;
             margin-bottom: 10px;
             font-size: 2.5em;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #255000, #8db600);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -68,7 +68,7 @@
         }
 
         .nav-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #255000, #8db600);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -77,16 +77,16 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(37, 80, 0, 0.4);
         }
 
         .nav-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 6px 20px rgba(37, 80, 0, 0.6);
         }
 
         .nav-btn.active {
-            background: linear-gradient(45deg, #764ba2, #667eea);
+            background: linear-gradient(45deg, #8db600, #255000);
             transform: translateY(-1px);
         }
 
@@ -120,7 +120,7 @@
             color: #4a5568;
             margin-bottom: 25px;
             font-size: 1.8em;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #255000;
             padding-bottom: 10px;
         }
 
@@ -147,12 +147,12 @@
 
         input:focus, select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #255000;
+            box-shadow: 0 0 0 3px rgba(37, 80, 0, 0.1);
         }
 
         .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #255000, #8db600);
             color: white;
             border: none;
             padding: 12px 30px;
@@ -162,12 +162,12 @@
             font-weight: 600;
             transition: all 0.3s ease;
             margin: 10px 5px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(37, 80, 0, 0.4);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 6px 20px rgba(37, 80, 0, 0.6);
         }
 
         .btn-secondary {
@@ -208,13 +208,13 @@
         }
 
         .vehicle-card.disponivel {
-            border-color: #48bb78;
-            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border-color: #8db600;
+            background: linear-gradient(135deg, #f0fff4 0%, #e6f9d5 100%);
         }
 
         .vehicle-card.alugado {
-            border-color: #ed8936;
-            background: linear-gradient(135deg, #fffaf0 0%, #fed7aa 100%);
+            border-color: #ff9800;
+            background: linear-gradient(135deg, #fff8e1 0%, #ffcc80 100%);
         }
 
         .vehicle-status {
@@ -228,12 +228,12 @@
         }
 
         .status-disponivel {
-            background: #48bb78;
+            background: #8db600;
             color: white;
         }
 
         .status-alugado {
-            background: #ed8936;
+            background: #ff9800;
             color: white;
         }
 
@@ -326,12 +326,12 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #255000 0%, #8db600 100%);
             color: white;
             padding: 20px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 16px rgba(37, 80, 0, 0.4);
         }
 
         .stat-number {
@@ -711,9 +711,19 @@
             const clienteNome = document.getElementById('clienteLocacao').value;
             const dias = parseInt(document.getElementById('diasLocacao').value);
             
+            if (!clienteNome) {
+                mostrarAlerta('error', 'Por favor, selecione um cliente!');
+                return;
+            }
+            
+            if (!dias || dias < 1) {
+                mostrarAlerta('error', 'Por favor, informe um número válido de dias!');
+                return;
+            }
+            
             // Encontrar o veículo e atualizá-lo
             const veiculo = veiculos.find(v => v.id === veiculoSelecionadoId);
-            if (veiculo) {
+            if (veiculo && veiculo.status === 'disponivel') {
                 veiculo.status = 'alugado';
                 veiculo.clienteLocacao = clienteNome;
                 
@@ -722,14 +732,17 @@
                     veiculoId: veiculoSelecionadoId,
                     dias: dias,
                     valorTotal: veiculo.valorDiaria * dias,
-                    dataLocacao: new Date()
+                    dataLocacao: new Date(),
+                    ativa: true
                 };
                 
                 locacoes.push(locacao);
-                mostrarAlerta('success', `Locação realizada com sucesso! Valor: R$ ${(veiculo.valorDiaria * dias).toFixed(2)}`);
+                mostrarAlerta('success', `Locação realizada com sucesso! Valor: R$ ${(veiculo.valorDiaria * dias).toFixed(2).replace('.', ',')}`);
                 fecharModal();
                 exibirVeiculos();
                 atualizarDashboard();
+            } else {
+                mostrarAlerta('error', 'Erro ao processar locação. Veículo pode não estar disponível.');
             }
         });
 
@@ -737,9 +750,11 @@
         document.getElementById('diasLocacao').addEventListener('input', function() {
             const dias = parseInt(this.value) || 0;
             const veiculo = veiculos.find(v => v.id === veiculoSelecionadoId);
-            if (veiculo) {
+            if (veiculo && dias > 0) {
                 const valorTotal = veiculo.valorDiaria * dias;
-                document.getElementById('valorTotal').textContent = `R$ ${valorTotal.toFixed(2)}`;
+                document.getElementById('valorTotal').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
+            } else {
+                document.getElementById('valorTotal').textContent = 'R$ 0,00';
             }
         });
 
@@ -818,38 +833,48 @@
             veiculoSelecionadoId = veiculoId;
             const veiculo = veiculos.find(v => v.id === veiculoId);
             
-            if (veiculo) {
+            if (veiculo && veiculo.status === 'disponivel') {
                 document.getElementById('veiculoSelecionado').textContent = 
                     `${veiculo.marca} ${veiculo.modelo} - ${veiculo.placa}`;
-                document.getElementById('valorTotal').textContent = `R$ ${veiculo.valorDiaria.toFixed(2)}`;
+                document.getElementById('valorTotal').textContent = `R$ ${veiculo.valorDiaria.toFixed(2).replace('.', ',')}`;
                 document.getElementById('diasLocacao').value = 1;
+                
+                // Limpar seleção anterior
+                document.getElementById('clienteLocacao').value = '';
                 
                 atualizarSelectClientes();
                 document.getElementById('modalLocacao').style.display = 'block';
+            } else {
+                mostrarAlerta('error', 'Este veículo não está disponível para locação.');
             }
         }
 
         function fecharModal() {
             document.getElementById('modalLocacao').style.display = 'none';
+            document.getElementById('locacaoForm').reset();
             veiculoSelecionadoId = null;
         }
 
         function devolverVeiculo(veiculoId) {
             const veiculo = veiculos.find(v => v.id === veiculoId);
-            if (veiculo && confirm(`Confirmar devolução do veículo ${veiculo.marca} ${veiculo.modelo}?`)) {
-                veiculo.status = 'disponivel';
-                delete veiculo.clienteLocacao;
-                
-                // Remover locação ativa
-                const index = locacoes.findIndex(l => l.veiculoId === veiculoId && l.ativa !== false);
-                if (index !== -1) {
-                    locacoes[index].ativa = false;
-                    locacoes[index].dataDevolucao = new Date();
+            if (veiculo && veiculo.status === 'alugado') {
+                if (confirm(`Confirmar devolução do veículo ${veiculo.marca} ${veiculo.modelo} - ${veiculo.placa}?`)) {
+                    veiculo.status = 'disponivel';
+                    delete veiculo.clienteLocacao;
+                    
+                    // Finalizar locação ativa
+                    const locacaoAtiva = locacoes.find(l => l.veiculoId === veiculoId && l.ativa !== false);
+                    if (locacaoAtiva) {
+                        locacaoAtiva.ativa = false;
+                        locacaoAtiva.dataDevolucao = new Date();
+                    }
+                    
+                    mostrarAlerta('success', 'Veículo devolvido com sucesso!');
+                    exibirVeiculos();
+                    atualizarDashboard();
                 }
-                
-                mostrarAlerta('success', 'Veículo devolvido com sucesso!');
-                exibirVeiculos();
-                atualizarDashboard();
+            } else {
+                mostrarAlerta('error', 'Erro ao processar devolução. Veículo pode não estar alugado.');
             }
         }
 
